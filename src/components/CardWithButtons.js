@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions, ScrollView } from 'react-native';
 import TextToSpeechComponent from './TextToSpeechComponent';
 import WordButton from './WordButton';
@@ -8,48 +8,51 @@ const reducedWidth = width;
 const reducedHeight = height - 88;
 console.log(reducedWidth, reducedHeight);
 
-const CardWithButtons = ({ cardData, cardIndex, resetCardIndex }) => {
+const CardWithButtons = ({ cardData, cardIndex, cardSelectedIndex, resetCardIndex }) => {
+
+  const scrollViewRef = useRef(null);
   const words = cardData.activity.trim().split(' ');
 
   const [sepakingText, setSepakingText] = useState('');
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [wordClickedIndex, setWordClickedIndex] = useState(-1);
   const [isCharSpeaking, setIsCharSpeaking] = useState(cardData.spellings && cardData.spellings ? true : false);
+  // const [isCharSpeaking, setIsCharSpeaking] = useState(true);
   const [charClickedIndex, setCharClickedIndex] = useState(-1);
   const [autoPlay, setAutoPlay] = useState(false);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
-
-  useEffect(() => {
-    if (cardIndex === resetCardIndex - 1 || cardIndex === resetCardIndex + 1) {
-      console.log(`Card at index ${cardIndex} needs to be reloaded`);
-      setAutoPlay(false);
-      setIsSpeaking(false);
-    }
-  }, [cardIndex, resetCardIndex]);
 
   const handleSpeechFinish = () => {
     if (!isCharSpeaking) {
       setWordClickedIndex(-1);
     }
+
     setIsSpeaking(false);
     setSepakingText('');
 
     if (currentWordIndex < words.length && autoPlay) {
-      setTimeout(() => {
+      requestAnimationFrame(() => {
         handleWordPress(currentWordIndex + 1, words[currentWordIndex + 1]);
-      }, 1);
+      });
+    } else if (currentWordIndex === words.length) {
+      setAutoPlay(false);
+      setCurrentWordIndex(0);
     }
   };
 
   const handleWordPress = async (index, word) => {
     setCurrentWordIndex(index);
+    setCurrentWordIndex(index);
+    scrollToWordButton(index);
 
     if (isCharSpeaking) {
-      const wordsList = word.split('');
+      const charsList = word.split('');
 
-      for (let charIndex = 0; charIndex < wordsList.length; charIndex++) {
-        const char = wordsList[charIndex];
-        await speakCharacter(char, index, charIndex);
+      if (charsList.length > 0) {
+        for (let charIndex = 0; charIndex < charsList.length; charIndex++) {
+          const char = charsList[charIndex];
+          await speakCharacter(char, index, charIndex);
+        }
       }
 
       await speakWord(word, index);
@@ -64,8 +67,10 @@ const CardWithButtons = ({ cardData, cardIndex, resetCardIndex }) => {
     setIsSpeaking(true);
     setSepakingText(char);
     setWordClickedIndex(wordIndex);
+    setCurrentWordIndex(wordIndex);
     setCharClickedIndex(charIndex);
   };
+
 
   const speakWord = async (word, wordIndex) => {
     const delay = isCharSpeaking ? 1000 * (word.length + 2) : 0;
@@ -74,6 +79,7 @@ const CardWithButtons = ({ cardData, cardIndex, resetCardIndex }) => {
 
     setIsSpeaking(true);
     setWordClickedIndex(wordIndex);
+    setCurrentWordIndex(wordIndex);
     setSepakingText(word);
 
     if (isCharSpeaking) {
@@ -94,41 +100,63 @@ const CardWithButtons = ({ cardData, cardIndex, resetCardIndex }) => {
     }
   };
 
+  const scrollToWordButton = (index) => {
+    if (scrollViewRef.current) {
+      const buttonHeight = 22; // Replace with the actual height of your WordButton
+      const screenHeight = Dimensions.get('window').height; // Get the height of the screen
+
+      // Calculate the offset to center the button on the screen
+      const offset = index * buttonHeight - screenHeight / 2 + buttonHeight / 2;
+
+      // Scroll to the calculated offset
+      scrollViewRef.current.scrollTo({ y: offset, animated: true });
+    }
+  };
+
   return (
     <View style={styles.card}>
-      {isSpeaking && (
-        <TextToSpeechComponent
-          textToSpeak={sepakingText}
-          isSpeaking={isSpeaking}
-          onSpeechFinish={handleSpeechFinish}
-        />
-      )}
-      <View style={{ flexDirection: 'row' }}>
-        <Text style={styles.title}>{cardData.title}</Text>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={enableAutoPlay}
-        >
-          <Text style={styles.buttonCharacter}>
-            {autoPlay ? "Pause" : "Play"}
-          </Text>
-        </TouchableOpacity>
-      </View>
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
-        <View style={styles.buttonContainer}>
-          {words.map((word, index) => (
-            <WordButton
-              key={index}
-              word={word}
-              index={index}
-              onClick={handleWordPress}
+      {cardIndex === cardSelectedIndex ?
+        <>
+          {isSpeaking && (
+            <TextToSpeechComponent
+              textToSpeak={sepakingText}
               isSpeaking={isSpeaking}
-              isSelected={index === wordClickedIndex}
-              charClickedIndex={charClickedIndex}
+              onSpeechFinish={handleSpeechFinish}
             />
-          ))}
+          )}
+          <View style={styles.headerContainer}>
+            <Text style={styles.title}>{cardData.title}</Text>
+            <TouchableOpacity style={styles.button} onPress={enableAutoPlay}>
+              <Text style={styles.buttonCharacter}>{autoPlay ? "Pause" : "Play"}</Text>
+            </TouchableOpacity>
+          </View>
+          <ScrollView
+            ref={scrollViewRef}
+            style={styles.scrollView}
+            contentContainerStyle={styles.scrollViewContent}
+          >
+            <View style={styles.buttonContainer}>
+              {words.map((word, index) => (
+                <WordButton
+                  key={index}
+                  word={word}
+                  index={index}
+                  onClick={handleWordPress}
+                  isSpeaking={isSpeaking}
+                  isSelected={index === wordClickedIndex}
+                  charClickedIndex={charClickedIndex}
+                />
+              ))}
+            </View>
+          </ScrollView>
+        </>
+        :
+        <View style={styles.loadingContainer}>
+          <Text>
+            Loading...
+          </Text>
         </View>
-      </ScrollView>
+      }
     </View>
   );
 };
@@ -140,6 +168,12 @@ const styles = StyleSheet.create({
     padding: 16,
     elevation: 3,
     justifyContent: 'center',
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    marginBottom: 10,
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   title: {
     fontSize: 28,
@@ -169,6 +203,11 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 'bold',
     color: 'white', // Default character color
+  },
+  loadingContainer: {
+    // flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

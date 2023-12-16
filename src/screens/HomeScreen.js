@@ -4,12 +4,6 @@ import SwipeableCards from '../components/SwipeableCards';
 import generatedNumbers from '../utils/Maths/ClassOne';
 
 const HomeScreen = () => {
-  // const data = [
-  //   { title: 'Card 1' },
-  //   { title: 'Card 2' },
-  //   { title: 'Card 3' },
-  //   // Add more data as needed
-  // ];
   const data = generatedNumbers;
 
   return (

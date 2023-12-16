@@ -101,11 +101,7 @@ const emojiMapping = {
 
 const WordButton = ({ word, index, onClick, isSpeaking, isSelected, charClickedIndex }) => {
   // useEffect to handle side effects when certain props change
-  useEffect(() => {
-    // Example: Perform some action when isSelected or charClickedIndex changes
-    // console.log('isSelected or charClickedIndex changed:', isSelected, charClickedIndex);
-  }, [isSelected, charClickedIndex]);
-
+  
   // Get the emoji based on the word from the mapping
   const emoji = emojiMapping[word.toLowerCase()] || '';
 
