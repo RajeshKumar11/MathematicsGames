@@ -9,6 +9,9 @@ jobs:
   build:
     runs-on: macOS-latest
 
+    env:
+      CI: 1  # Set the CI environment variable
+
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v2
@@ -22,7 +25,7 @@ jobs:
       run: npm ci
 
     - name: Build Expo iOS
-      run: npm run build:ios
+      run: expo build:ios
 
     - name: Archive and Export iOS
       run: expo build:ios --non-interactive
