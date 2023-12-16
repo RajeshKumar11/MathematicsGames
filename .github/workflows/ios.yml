@@ -21,6 +21,9 @@ jobs:
       with:
         node-version: '20'
 
+    - name: Install Expo CLI
+      run: npm install -g expo-cli
+
     - name: Install Dependencies
       run: npm ci
 
