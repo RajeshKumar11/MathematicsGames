@@ -19,7 +19,7 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '20'
+        node-version: '18.18.1'
 
     - name: Install Expo CLI
       run: npm install -g expo-cli
