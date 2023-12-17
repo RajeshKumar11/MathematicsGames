@@ -24,17 +24,17 @@ jobs:
     - name: Install Expo CLI
       run: npm install -g expo-cli
 
+    - name: Install EAS CLI
+      run: npm install -g eas-cli@latest
+
     - name: Install Dependencies
       run: npm ci
 
     - name: Build Expo iOS
-      run: expo build:ios
-
-    - name: Archive and Export iOS
-      run: expo build:ios --non-interactive
+      run: eas build -p ios
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2
       with:
         name: ios-build
-        path: ios
+        path: eas/build
