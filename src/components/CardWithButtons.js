@@ -32,6 +32,7 @@ const CardWithButtons = ({ cardData, cardIndex, cardSelectedIndex }) => {
   const [isCharSpeaking, setIsCharSpeaking] = useState(
     cardData.spellings && cardData.spellings ? true : false
   );
+  // const [isCharSpeaking, setIsCharSpeaking] = useState(true);
   const [charClickedIndex, setCharClickedIndex] = useState(-1);
   const [autoPlay, setAutoPlay] = useState(false);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);

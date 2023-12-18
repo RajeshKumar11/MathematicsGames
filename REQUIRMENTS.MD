@@ -1,5 +1,11 @@
 # Application Requirements
 
+## Implementation Requirments
+
+- Change word word to sentance based to avoid delay in speaking
+- Add button animation on clicking the word
+- 
+
 ## General Requirements
 
 1. **Cross-Platform Compatibility:**
