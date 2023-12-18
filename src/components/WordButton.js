@@ -1,115 +1,30 @@
+// Import necessary modules from React and React Native
 import React, { useEffect } from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 
-// Mapping between words and corresponding emojis
-const emojiMapping = {
-  'wake': '⏰',
-  'early': '🌅',
-  'to-do': '📝',
-  'organized': '🗃️',
-  'exercise': '🏋️‍♂️',
-  'physical': '🏃',
-  'mental': '🧠',
-  'well-being': '💪',
-  'balanced': '⚖️',
-  'nutritious': '🥦',
-  'diet': '🍎',
-  'fruits': '🍏',
-  'vegetables': '🥕',
-  'hydrated': '💧',
-  'water': '🚰',
-  'sleep': '😴',
-  'books': '📚',
-  'knowledge': '🧠',
-  'mind': '🤔',
-  'mindfulness': '🧘',
-  'meditation': '🧘‍♂️',
-  'gratitude': '🙏',
-  'positive': '😊',
-  'goals': '🎯',
-  'skill': '🛠️',
-  'hobby': '🎨',
-  'screen time': '📱⏰',
-  'breaks': '☕',
-  'technology': '🔧',
-  'posture': '🚶‍♂️',
-  'health': '❤️',
-  'relationships': '👫',
-  'listening': '👂',
-  'processed foods': '🍔🚫',
-  'sugars': '🍬🚫',
-  'breathing exercises': '🌬️',
-  'reduce stress': '😌',
-  'volunteer': '🤝',
-  'journal': '📓',
-  'self-care': '🛁',
-  'positive attitude': '😇',
-  'challenging situations': '🤨',
-  'organized': '🗂️',
-  'decluttering': '🧹',
-  'living spaces': '🏡',
-  'workspaces': '🏢',
-  'boundaries': '🚧',
-  'work-life balance': '⚖️',
-  'say "no"': '🙅‍♂️',
-  'overcommitment': '🚫',
-  'review': '📋',
-  'assess': '🤔',
-  'empathy': '🤝',
-  'understanding': '🤔',
-  'continuous learning': '📚🎓',
-  'growth': '🌱',
-  'save money': '💰',
-  'budgeting': '📊',
-  'curious': '🤔',
-  'ask questions': '❓',
-  'tolerance': '🌍',
-  'open-mindedness': '🤯',
-  'creativity': '🎨',
-  'art': '🎨',
-  'writing': '📝',
-  'growth mindset': '🌱🧠',
-  'effective stress management': '🧘‍♂️',
-  'communication skills': '🗣️',
-  'random acts of kindness': '🤝',
-  'healthy meals': '🥗',
-  'mental health': '🧠❤️',
-  'support': '🤗',
-  'negative news': '🚫📰',
-  'positive media diet': '🌐📰',
-  'physical activities': '🏃‍♂️',
-  'time management': '⌛',
-  'optimization': '🔄',
-  'expressing': '🗣️',
-  'receiving feedback': '👂🔄',
-  'sense of humor': '😄',
-  'joy': '😊',
-  'small moments': '🌈',
-  'assess and update goals': '🔄📋',
-  'relax': '☕😌',
-  'recharge': '⚡',
-  'environmental consciousness': '🌍♻️',
-  'sustainability': '♻️',
-  'resilience': '🌳',
-  'challenges': '🏔️',
-  'financial goals': '💰🎯',
-  'future': '🔮',
-  'supportive social network': '🤝',
-  'celebrate achievements': '🎉🏆',
-  'mindfulness in daily activities': '🧘‍♂️🌍',
-};
+// Import emoji mapping utility
+import { emojiMapping } from '../utils/EmojiMapping';
 
-const WordButton = ({ word, index, onClick, isAutoPlay, isSpeaking, isSelected, charClickedIndex }) => {
-  // useEffect to handle side effects when certain props change
+// Define the WordButton functional component
+const WordButton = ({
+  word,
+  index,
+  onClick,
+  isAutoPlay,
+  isSpeaking,
+  isSelected,
+  charClickedIndex,
+}) => {
   
   // Get the emoji based on the word from the mapping
   const emoji = emojiMapping[word.toLowerCase()] || '';
 
+  // Render the WordButton component
   return (
     <TouchableOpacity
       style={[
         styles.button,
-        isSelected && styles.selectedButton
+        isSelected && styles.selectedButton,
       ]}
       onPress={() => onClick(index, word)}
       disabled={isSpeaking || isAutoPlay}
@@ -132,6 +47,7 @@ const WordButton = ({ word, index, onClick, isAutoPlay, isSpeaking, isSelected, 
   );
 };
 
+// Styles for the WordButton component
 const styles = StyleSheet.create({
   button: {
     backgroundColor: '#3498db',
@@ -161,4 +77,5 @@ const styles = StyleSheet.create({
   },
 });
 
+// Export the WordButton component as the default export of this module
 export default WordButton;

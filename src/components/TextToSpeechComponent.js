@@ -1,13 +1,19 @@
+// Import necessary modules from React
 import React, { useState, useEffect } from 'react';
+
+// Import Speech module from Expo for text-to-speech functionality
 import * as Speech from 'expo-speech';
 
+// Function to speak the provided text
 const speak = async (text, onSpeechFinish) => {
   try {
+    // Use Expo Speech module to speak the provided text with certain options
     await Speech.speak(text, {
-      language: 'en',
+      language: 'en', // Specify the language (English in this case)
       rate: 0.8, // Speed: 1.0 is the default, adjust as needed
       pitch: 1.0, // Pitch: 1.0 is the default, adjust as needed
     });
+
     // Notify the parent component that speech is finished after a delay
     setTimeout(() => {
       if (onSpeechFinish) {
@@ -19,14 +25,19 @@ const speak = async (text, onSpeechFinish) => {
   }
 };
 
+// Define the TextToSpeechComponent functional component
 const TextToSpeechComponent = ({ textToSpeak, isSpeaking, onSpeechFinish }) => {
+  // Effect to handle changes in 'textToSpeak' or 'isSpeaking'
   useEffect(() => {
-    if (isSpeaking) {
+    // If speech is requested and there is text to speak, invoke the 'speak' function
+    if (isSpeaking && textToSpeak) {
       speak(textToSpeak, onSpeechFinish);
     }
   }, [textToSpeak, isSpeaking]);
 
-  return null; // Return null as there is no UI element in this component
+  // Return null as there is no UI element in this component
+  return null;
 };
 
+// Export the TextToSpeechComponent component as the default export of this module
 export default TextToSpeechComponent;

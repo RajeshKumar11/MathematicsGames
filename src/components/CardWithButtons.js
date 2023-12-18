@@ -1,29 +1,49 @@
+// Import necessary modules from React and React Native
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Dimensions,
+  ScrollView,
+} from 'react-native';
+
+// Import custom components for text-to-speech and word button
 import TextToSpeechComponent from './TextToSpeechComponent';
 import WordButton from './WordButton';
 
+// Get the device dimensions
 const { width, height } = Dimensions.get('window');
 const reducedHeight = height - 88;
 
+// Define the CardWithButtons functional component
 const CardWithButtons = ({ cardData, cardIndex, cardSelectedIndex }) => {
+  // Ref to scroll view
   const scrollViewRef = useRef(null);
+
+  // Extract words from the activity
   const words = cardData.activity.trim().split(' ');
 
+  // State variables
   const [speakingText, setSpeakingText] = useState('');
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [wordClickedIndex, setWordClickedIndex] = useState(-1);
-  const [isCharSpeaking, setIsCharSpeaking] = useState(cardData.spellings && cardData.spellings ? true : false);
+  const [isCharSpeaking, setIsCharSpeaking] = useState(
+    cardData.spellings && cardData.spellings ? true : false
+  );
   const [charClickedIndex, setCharClickedIndex] = useState(-1);
   const [autoPlay, setAutoPlay] = useState(false);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
 
+  // Effect to handle auto-play functionality
   useEffect(() => {
     if (autoPlay) {
       handleWordPress(currentWordIndex, words[currentWordIndex]);
     }
   }, [autoPlay]);
 
+  // Callback when text-to-speech finishes
   const handleSpeechFinish = () => {
     if (!isCharSpeaking) {
       setWordClickedIndex(-1);
@@ -42,6 +62,7 @@ const CardWithButtons = ({ cardData, cardIndex, cardSelectedIndex }) => {
     }
   };
 
+  // Function to handle word pressing
   const handleWordPress = async (index, word) => {
     setCurrentWordIndex(index);
     scrollToWordButton(index);
@@ -62,6 +83,7 @@ const CardWithButtons = ({ cardData, cardIndex, cardSelectedIndex }) => {
     }
   };
 
+  // Function to speak individual characters
   const speakCharacter = async (char, wordIndex, charIndex) => {
     await new Promise((resolve) => setTimeout(resolve, 1000 * charIndex));
 
@@ -72,6 +94,7 @@ const CardWithButtons = ({ cardData, cardIndex, cardSelectedIndex }) => {
     setCharClickedIndex(charIndex);
   };
 
+  // Function to speak the entire word
   const speakWord = async (word, wordIndex) => {
     const delay = isCharSpeaking ? 1000 * (word.length + 2) : 0;
 
@@ -89,11 +112,13 @@ const CardWithButtons = ({ cardData, cardIndex, cardSelectedIndex }) => {
     }
   };
 
+  // Function to enable/disable auto-play
   const enableAutoPlay = () => {
     setAutoPlay(!autoPlay);
     console.log(`Auto Play ${autoPlay ? 'Disabled' : 'Enabled'}`);
   };
 
+  // Function to scroll to a specific word button
   const scrollToWordButton = (index) => {
     if (scrollViewRef.current) {
       const buttonHeight = 22;
@@ -104,6 +129,7 @@ const CardWithButtons = ({ cardData, cardIndex, cardSelectedIndex }) => {
     }
   };
 
+  // Render the component
   return (
     <View style={styles.card}>
       {cardIndex === cardSelectedIndex ? (
@@ -151,6 +177,7 @@ const CardWithButtons = ({ cardData, cardIndex, cardSelectedIndex }) => {
   );
 };
 
+// Styles for the component
 const styles = StyleSheet.create({
   card: {
     backgroundColor: '#fff',
@@ -199,4 +226,5 @@ const styles = StyleSheet.create({
   },
 });
 
+// Export the CardWithButtons component as the default export of this module
 export default CardWithButtons;
