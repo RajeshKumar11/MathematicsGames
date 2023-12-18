@@ -99,7 +99,7 @@ const emojiMapping = {
   'mindfulness in daily activities': '🧘‍♂️🌍',
 };
 
-const WordButton = ({ word, index, onClick, isSpeaking, isSelected, charClickedIndex }) => {
+const WordButton = ({ word, index, onClick, isAutoPlay, isSpeaking, isSelected, charClickedIndex }) => {
   // useEffect to handle side effects when certain props change
   
   // Get the emoji based on the word from the mapping
@@ -112,7 +112,7 @@ const WordButton = ({ word, index, onClick, isSpeaking, isSelected, charClickedI
         isSelected && styles.selectedButton
       ]}
       onPress={() => onClick(index, word)}
-      disabled={isSpeaking}
+      disabled={isSpeaking || isAutoPlay}
     >
       <Text style={styles.buttonText}>
         {emoji && <Text style={styles.emoji}>{emoji}</Text>} {/* Display emoji if available */}

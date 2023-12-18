@@ -4,23 +4,25 @@ import TextToSpeechComponent from './TextToSpeechComponent';
 import WordButton from './WordButton';
 
 const { width, height } = Dimensions.get('window');
-const reducedWidth = width;
 const reducedHeight = height - 88;
-console.log(reducedWidth, reducedHeight);
 
-const CardWithButtons = ({ cardData, cardIndex, cardSelectedIndex, resetCardIndex }) => {
-
+const CardWithButtons = ({ cardData, cardIndex, cardSelectedIndex }) => {
   const scrollViewRef = useRef(null);
   const words = cardData.activity.trim().split(' ');
 
-  const [sepakingText, setSepakingText] = useState('');
+  const [speakingText, setSpeakingText] = useState('');
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [wordClickedIndex, setWordClickedIndex] = useState(-1);
   const [isCharSpeaking, setIsCharSpeaking] = useState(cardData.spellings && cardData.spellings ? true : false);
-  // const [isCharSpeaking, setIsCharSpeaking] = useState(true);
   const [charClickedIndex, setCharClickedIndex] = useState(-1);
   const [autoPlay, setAutoPlay] = useState(false);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
+
+  useEffect(() => {
+    if (autoPlay) {
+      handleWordPress(currentWordIndex, words[currentWordIndex]);
+    }
+  }, [autoPlay]);
 
   const handleSpeechFinish = () => {
     if (!isCharSpeaking) {
@@ -28,7 +30,7 @@ const CardWithButtons = ({ cardData, cardIndex, cardSelectedIndex, resetCardInde
     }
 
     setIsSpeaking(false);
-    setSepakingText('');
+    setSpeakingText('');
 
     if (currentWordIndex < words.length && autoPlay) {
       requestAnimationFrame(() => {
@@ -41,7 +43,6 @@ const CardWithButtons = ({ cardData, cardIndex, cardSelectedIndex, resetCardInde
   };
 
   const handleWordPress = async (index, word) => {
-    setCurrentWordIndex(index);
     setCurrentWordIndex(index);
     scrollToWordButton(index);
 
@@ -65,12 +66,11 @@ const CardWithButtons = ({ cardData, cardIndex, cardSelectedIndex, resetCardInde
     await new Promise((resolve) => setTimeout(resolve, 1000 * charIndex));
 
     setIsSpeaking(true);
-    setSepakingText(char);
+    setSpeakingText(char);
     setWordClickedIndex(wordIndex);
     setCurrentWordIndex(wordIndex);
     setCharClickedIndex(charIndex);
   };
-
 
   const speakWord = async (word, wordIndex) => {
     const delay = isCharSpeaking ? 1000 * (word.length + 2) : 0;
@@ -80,7 +80,7 @@ const CardWithButtons = ({ cardData, cardIndex, cardSelectedIndex, resetCardInde
     setIsSpeaking(true);
     setWordClickedIndex(wordIndex);
     setCurrentWordIndex(wordIndex);
-    setSepakingText(word);
+    setSpeakingText(word);
 
     if (isCharSpeaking) {
       setTimeout(() => {
@@ -90,36 +90,27 @@ const CardWithButtons = ({ cardData, cardIndex, cardSelectedIndex, resetCardInde
   };
 
   const enableAutoPlay = () => {
-    if (!autoPlay) {
-      setAutoPlay(true);
-      handleWordPress(currentWordIndex, words[currentWordIndex]);
-      console.log("Auto Play Enabled");
-    } else {
-      setAutoPlay(false);
-      console.log("Auto Play Disabled");
-    }
+    setAutoPlay(!autoPlay);
+    console.log(`Auto Play ${autoPlay ? 'Disabled' : 'Enabled'}`);
   };
 
   const scrollToWordButton = (index) => {
     if (scrollViewRef.current) {
-      const buttonHeight = 22; // Replace with the actual height of your WordButton
-      const screenHeight = Dimensions.get('window').height; // Get the height of the screen
+      const buttonHeight = 22;
+      const screenHeight = Dimensions.get('window').height;
 
-      // Calculate the offset to center the button on the screen
       const offset = index * buttonHeight - screenHeight / 2 + buttonHeight / 2;
-
-      // Scroll to the calculated offset
       scrollViewRef.current.scrollTo({ y: offset, animated: true });
     }
   };
 
   return (
     <View style={styles.card}>
-      {cardIndex === cardSelectedIndex ?
+      {cardIndex === cardSelectedIndex ? (
         <>
           {isSpeaking && (
             <TextToSpeechComponent
-              textToSpeak={sepakingText}
+              textToSpeak={speakingText}
               isSpeaking={isSpeaking}
               onSpeechFinish={handleSpeechFinish}
             />
@@ -127,7 +118,7 @@ const CardWithButtons = ({ cardData, cardIndex, cardSelectedIndex, resetCardInde
           <View style={styles.headerContainer}>
             <Text style={styles.title}>{cardData.title}</Text>
             <TouchableOpacity style={styles.button} onPress={enableAutoPlay}>
-              <Text style={styles.buttonCharacter}>{autoPlay ? "Pause" : "Play"}</Text>
+              <Text style={styles.buttonCharacter}>{autoPlay ? 'Pause' : 'Play'}</Text>
             </TouchableOpacity>
           </View>
           <ScrollView
@@ -141,6 +132,7 @@ const CardWithButtons = ({ cardData, cardIndex, cardSelectedIndex, resetCardInde
                   key={index}
                   word={word}
                   index={index}
+                  isAutoPlay={autoPlay}
                   onClick={handleWordPress}
                   isSpeaking={isSpeaking}
                   isSelected={index === wordClickedIndex}
@@ -150,13 +142,11 @@ const CardWithButtons = ({ cardData, cardIndex, cardSelectedIndex, resetCardInde
             </View>
           </ScrollView>
         </>
-        :
+      ) : (
         <View style={styles.loadingContainer}>
-          <Text>
-            Loading...
-          </Text>
+          <Text>Loading...</Text>
         </View>
-      }
+      )}
     </View>
   );
 };
@@ -183,13 +173,12 @@ const styles = StyleSheet.create({
     alignContent: 'center',
   },
   scrollView: {
-    height: reducedHeight, // Set the desired height
-    // Add any other styles you need for the ScrollView
+    height: reducedHeight,
   },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    flexWrap: 'wrap', // Allow buttons to wrap to the next line
+    flexWrap: 'wrap',
   },
   button: {
     backgroundColor: 'green',
@@ -202,10 +191,9 @@ const styles = StyleSheet.create({
   buttonCharacter: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: 'white', // Default character color
+    color: 'white',
   },
   loadingContainer: {
-    // flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },

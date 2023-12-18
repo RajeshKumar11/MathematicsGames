@@ -28,7 +28,6 @@ const SwipeableCards = ({ data }) => {
               cardData={card}
               cardIndex={index}
               cardSelectedIndex={cardSelectedIndex}
-              resetCardIndex={cardSelectedIndex}
             />
           ) : (
             <LoadingComponent />
